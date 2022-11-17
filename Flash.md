@@ -296,3 +296,383 @@ app.register_blueprint(admin,url_prefix=' / admin ')
 也可通过static_url_path改变访问路径
 admin = Blueprint("admin"，__name__,static_folder='static_admin ' , static_url_path='/lib')app.register_blueprint(admin,url_prefix= ' / admin ' )
 
+### 蓝图内部模板目录
+
+蓝图对象默认的模板目录为系统的模版目录，可以在创建蓝图对象时使用template_folder关键字参数设置模板目录
+admin = Blueprint( ' admin ' ,__name__,template_folder='my_templates ')
+
+# 请求和响应
+
+
+
+## 处理请求
+
+### 需求
+
+在视图编写中需要读取客户端请求携带的数据时，如何才能正确的取出数据呢?
+请求携带的数据可能出现在HTTP报文中的不同位置，需要使用不同的方法来获取参数。
+
+### 转换器
+
+例如，有一个请求访问的接口地址为/users/123，其中123实际上为具体的请求参数，表明请求123号用户的信息。此时如何从url中提取出123的数据?
+Flask不同于Django直接在定义路由时编写正则表达式的方式，而是采用转换器语法:
+
+@app.route( '/users/Juser_id>')
+def user_info(user_id ):
+	print(type(user_id))
+	return 'hello user {}'.format(user_id)
+
+此处的<>即是一个转换器，默认为字符串类型，即将该位置的数据以字符串格式进行匹配、并以字符串数据类型类型、 user_id为参数名传入视图。
+
+
+
+Flask也提供其他类型的转换器
+DEFAULT_CONVERTERS = {
+'default ': Unicodeconverter,
+'string ':UnicodeConverter,
+'any ':AnyConverter,
+' path ': PathConverter,
+'int ':IntegerConverter,
+'float':FloatConverter,
+' uuid ' :UUIDConverter,
+}
+
+将上面的例子以整型匹配数据，可以如下使用:
+@app.route( '/users/<intluser_id>')
+def user_info(user_id):
+	print(type(user_id ))
+	return 'hello user {]} '.format(user_id)
+
+@app.route( ' /users/< int(min=1):user_id > ')
+def user_info(user_id ):
+	print(type(user_id))
+	return 'hello user {} '.format(user_id)
+
+### 定义方法
+
+自定义转换器主要做3步
+1.创建转换器类，保存匹配时的正则表达式
+
+from werkzeug . routing import BaseConverter
+class Mobileconverter(BaseConverter):
+	"""
+	手机号格式
+	"""
+	regex = r' 1[3-9] \d{9}'
+
+注意regex名字固定
+
+2.将自定义的转换器告知Flask应用
+app = Flask(__name__)
+#将自定义转换器添加到转换器字典中，并指定转换器使用时名字为:
+ mobileapp.url_map.converters [ ' mobile ' ] = Mobileconverter
+
+3.在使用转换器的地方定义使用
+
+@app.route( ' /sms_codes/<mobile:mob_num >')
+def send_sms_code( mob_num ) :
+	return 'send sms code to {i} '.format(mob_num)
+
+2.其他参数
+如果想要获取其他地方传递的参数，可以通过Flask提供的request对象
+不同位置的参数都存放在request的不同属性中
+属性		说明
+data		记录请求的数据，并转换为字符串
+form		记录请求中的表单数据
+args		记录请求中的查询参数
+cookies	记录请求中的cookie信息
+headers	记录请求中的报文头
+method	记录请求使用的HTTP方法
+url	记录请求的URL地址
+files	记录请求上传的文件
+
+## 处理响应
+
+### 需求
+
+如何在不同的场景里返回不同的响应信息?
+
+### 1 返回模板 render_template
+
+使用render_template方法渲染模板并返回
+例如，新建一个模板index.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+我的模板html内容
+<br/>{{my_str}}
+<br/>{{my_int}}
+</body>
+</html>
+
+from flask import render_template
+@app.route('/')
+def index():
+	mstr = 'Hello黑马程序员'
+	mint = 10
+	return render_template( 'index.html', my_str=mstr, my_int=mint)
+
+
+
+### 2 重定向
+
+from flask import redirect
+
+@app.route( '/demo2 ' )
+def demo2( ) :
+	return redirect( 'http: //www.itheima. com ')
+
+
+
+### 3 返回JSON
+
+from flask importxjsonify
+
+@app.route( ' /demo3 ')
+def demo3():
+	json_dict = {
+	"user_id" :10,
+	"user_name" : "laowang"
+	}
+	return jsonify(json_dict)
+
+·return json.dumps()
+
+·return jsonify
+
+​	转换成json格式字符串
+​	设置了响应头Content-Type:application/json
+
+### 4自定义状态码和响应头
+
+#### 1)元组方式
+
+可以返回一个元组，这样的元组必须是**(response, status, headers)**的形式，且至少包含一个元素。status值会覆盖状态代码, headers可以是一个列表或字典，作为额外的消息标头值。
+@app.route( ' /demo4 ' )
+def demo4( ):
+	#return '状态码为666',666
+	return '状态码为 666'， 666， {'Itcast': 'Python'}
+
+
+
+#### 2)make_response方式
+
+@app.route( ' /demo5 ' )
+def demo5( ):
+	resp = make_response( 'make response测试')
+	resp.headers ["Itcast"] =“Python"
+	resp.statusI“404 not found"
+	return resp
+
+## Cookie
+
+设置
+from flask import Flask, make_response
+app = Flask( __name___)
+@app.route( '/cookie ')def set_cookie( ) :
+resp = make_response( 'set cookie ok ')resp.set_cookie( 'username ' , 'itcast ')return resp
+
+设置有效期
+@app.route( ' /cookie ')
+def set_cookie( ) :
+	response = make_response( ' hello world ')
+	response.set_cookie('username','itheima',Imax_age=3600)
+	return response
+
+读取
+from flask import request
+
+@app.route( '/get_cookie ' )
+def get_cookie( ) :
+	resp = request.cookies.get( 'username ' )
+	return resp
+
+删除
+from flask import request
+@app.route( ' /delete_cookie ' )
+def delete_cookie( ) :
+	response = make_response('helloworld')
+	response.delete_cookie( 'username ' )
+	return response
+实现原理：修改cookie的有效期
+
+## Session
+
+保存会话数据
+
+session的使用需要先设置SECRET_KEY
+class DefaultConfig(object):
+	SECRET_KEY = 'fih9fh9eh9gh2 '
+
+app. config.from_object(DefaultConfig)
+
+或者直接设置
+app.secret_key='xihwidfw9efw '
+
+### 设置
+
+from flask import session
+
+@app.route( ' /set_session')
+def set_session( ) :
+	session[ 'username ' ] = 'itcast'
+	return 'set session ok'
+
+### 读取
+
+@app.route( '/get_session' )
+def get_session( ) :
+	username = session. get( 'username ' )
+	return 'get session username {} '.format(username)
+
+# 请求钩子与上下文
+
+## 异常处理
+
+### HTTP异常主动抛出
+
+​	abort方法
+
+​		抛出一个给定状态代码的HTTPException或者 指定响应，例如	想要用一个页面未找到异常来终止请求，你可以调用abort（404）
+
+​	参数：
+​		code-HTTP的错误状态码
+
+#abort（400）
+abort(500)
+抛出状态码的话，只能抛出HTTP协议的错误状态码
+
+
+
+### 捕获错误
+
+ errorhandler装饰器
+ 	注册一个错误处理程序，当程序抛出指定错误状态码的时候，就会调用该装饰器所装饰的方法
+·参数:
+		code_or_exception - HTTP的错误状态码或指定异常
+·例如统一处理状态码为500的错误给用户友好的提示:
+@app.errorhandler(500)
+def internal_server_error(e):
+	return '服务器搬家了'
+
+·捕获指定异常
+
+@app.errorhandler(zeroDivisionError)
+def zero_division_error(e):
+	return '除数不能为0'
+
+## 中间件说明（请求钩子）
+
+请求的处理过程pre_process -> view -> after_process
+
+request请求支持处理流程
+middleware1.pre_process() -> m2.pre_process() -> m3.pre_process()->view()
+ -> m3.after_process() -> m2.after_process() -> m1.after_process()
+
+中间件处理 不区分具体是哪个视图，对所有视图通通生效
+
+在客户端和服务器交互的过程中，有些准备工作或扫尾工作需要处理，比如:
+·在请求开始时，建立数据库连接;
+·在请求开始时，根据需求进行权限校验;
+·在请求结束时，指定数据的交互格式;
+
+为了让每个视图函数避免编写重复功能的代码，Flask提供了通用设施的功能，即请求钩子。
+
+请求钩子是通过装饰器的形式实现，Flask支持如下四种请求钩子:
+. before_first_request
+		在处理第一个请求前执行. 
+
+before_request
+		在每次请求前执行
+		如果在某修饰的函数中返回了一个响应，视图函数将不再被调用
+
+after_request
+		如果没有抛出错误，在每次请求后执行。
+		接受一个参数:视图函数作出的响应
+		在此函数中可以对响应值在返回之前做最后一步修改处理。
+		需要将参数中的响应在此参数中进行返回
+
+teardown_request:
+		在每次请求后执行
+		接受一个参数:错误信息，如果有相关错误抛出
+
+```python
+#在第一次请求之前调用，可以在此方法内部做一些初始化操作@app.before_first_request
+def before_first_request():
+    print ( "before_first_request")
+#在每一次请求之前调用，这时候已经有请求了，可能在这个方法里面做请求的校验
+#如果请求的校验不成功，可以直接在此方法中进行响应，直接return之后那么就不会执行视图函数@app.before_request
+def before_request():
+    print( "before_request")#if请求不符合条件:
+#return "la9wang"
+#在执行完视图函数之后会调用，并且会把视图函数所生成的响应传入,可以在此方法中对响应做最后一步统一的处理
+@app.after_request
+def after_request(response):
+    print( "after_request")
+response.headers ["Content-Type"] = "application/json"return response
+#请每一次请求之后都会调用，会接受一个参数，参数是服务器出现的错误信息@app.teardown_request
+def teardown_request(response):
+    print( "teardown_request")
+ 
+```
+
+
+
+## 上下文
+
+### 请求上下文
+
+思考︰在视图函数中，如何取到当前请求的相关数据?比如︰请求地址，请求方式，cookie等等在flask中，可以直接在视图函数中使用request 这个对象进行获取相关数据，而request就是请的对象，保存了当前本次请求的相关数据，请求上下文对象有:request、session
+request
+	封装了HTTP请求的内容，针对的是http请求。举例: user = request.args.get(user')，获 
+请求的参数。
+session
+	用来记录请求会话中的信息，针对的是用户信息。举例: session['name'] = user.id，可以信息。还可以通过session.get('name')获取用户信息。
+
+
+
+### 2应用上下文(application context)
+
+它的字面意思是应用上下文，但它不是一直存在的，它只是request context中的一个对app的代理人谓local proxy。它的作用主要是帮助request 获取当前的应用，它是伴request而生，随request而灭应用上下文对象有:current_app，g
+
+#### current_app
+
+应用程序上下文,用于存储应用程序中的变量，可以通过curgent_app.name打印当前app的名称，也可以current_app中存储一些变量，例如∶
+·应用的启动脚本是哪个文件，启动时指定了哪些参数
+·加载了哪些配置文件，导入了哪些配置
+·连了哪个数据库
+·有哪些public的工具类、常量
+·应用跑在哪个机器上，IP多少，内存多大
+
+示例
+
+
+
+作用
+current_app就是当前运行的flask app，在代码不方便直接操作flask的app对象时，可以操作current_app 就等价于操作flask app对象
+
+#### g对象
+
+g作为 flask程序全局的一个临时变量，充当中间媒介的作用，我们可以通过它在一次请求调用的多个函数间传递一些数据。每次请求都会重设这个变量。
+
+示例
+
+from flask import Flask, g
+
+app = Flask(__name__)
+
+def db_query ( ):
+	user_id = g.user_id
+	user_name = g.user_name
+	print( 'user_id={(}user_name={}'.format(user_id,user_name))
+
+@app.route( ' / ')
+def get_user_profile():
+	g.user_id = 123
+	g.user_name = 'itcast'db_query()
+	return 'hello world '
