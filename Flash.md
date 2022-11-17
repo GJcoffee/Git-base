@@ -1,3 +1,5 @@
+# flask工程搭建和配置
+
 ## 1 flask框架
 
 核心  Werkzerug + Jinja2
@@ -27,7 +29,7 @@ from flask import Flask
 
 #Flask类接收一个参数
 
-app = Flask(__name___)
+app = Flask(__name__)
 #装饰器的作用是将路由映射到视图函数index@app.route( ' / ')
 def index( ):
 return 'Hello world'
@@ -66,13 +68,14 @@ class Defaultconfig(object):
 """默认配置"“"""
     SECRET_KEY ='TPmi4aLWRbyVq8zu9v82dwYW1'
 
-app = Flask(__name_)
+app = Flask(__name__)
 
-app.config.fom_object(Defaultconfig)
+app.config.from_object(Defaultconfig)
 
 app.route("/")
 def index( ) :
-	print(app.config[ ' SECRET_KEY'])return "hello world"
+	print(app.config[ ' SECRET_KEY'])
+	return "hello world"
 
 应用场景:
 作为默认配置写在程序代码中
@@ -208,9 +211,9 @@ $ flask run
 
 
 
-## 路由与蓝图
+# 路由与蓝图
 
-### 路由
+## 1 路由
 
 #### 1.查询路由信息
 
@@ -256,7 +259,7 @@ return "hello world 2"
 
 
 
-## 蓝图
+##  2 蓝图
 
 在Flask中，使用蓝图Blueprint来分模块组织管理。
 蓝图实际可以理解为是一个存储一组视图方法的容器对象，其具有如下特点:
@@ -267,5 +270,27 @@ Blueprint可以单独具有自己的模板、静态文件或者其它的通用�
 在一个应用初始化时，就应该要注册需粟使用的Blueprint
 但是一个Blueprint并不是一个完整的应用，它不能独立于应用运行，而必须要注册到某一个应用中。
 
+### 使用蓝图可以分为三个步骤
 
+1.创建一个蓝图对象
+user_bp=Blueprint( 'user' ,__name__)
+2.在这个蓝图对象上进行操作,注册路由,指定静态文件夹,注册模版过滤器
+@user_bp.route(' / ')
+def user_profile( ):
+	return 'user_profile'
+3.在应用对象上注册这个蓝图对象
+app.register_blueprint(user_bp)
+同级文件可以直接注册，在目录中的话需要先导入再注册
+
+### 蓝图内部静态文件
+
+和应用对象不同，蓝图对象创建时不会默认注册静态目录的路由。需要我们在创建时指定 static_folder参数。
+
+下面的示例将蓝图所在目录下的static_admin目录设置为静态目录
+admin=Blueprint("admin",__name__,static_folder='static_admin')
+app.register_blueprint(admin,url_prefix=' / admin ')
+
+现在就可以使用/admin/static_admin/<filename>访问static_admin目录下的静态文件了。
+也可通过static_url_path改变访问路径
+admin = Blueprint("admin"，__name__,static_folder='static_admin ' , static_url_path='/lib')app.register_blueprint(admin,url_prefix= ' / admin ' )
 
