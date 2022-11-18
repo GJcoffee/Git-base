@@ -676,3 +676,87 @@ def get_user_profile():
 	g.user_id = 123
 	g.user_name = 'itcast'db_query()
 	return 'hello world '
+
+## g对象与请求钩子综合案例
+
+### 需求
+
+构建认证机制
+对于特定视图可以提供强制要求用户登录的限制
+	对于所有视图，无论是否强制要求用户登录，都可以在视图中尝试获取用户认证后的身份信息
+
+分析
+特定强制需求->装饰器
+所有视图的需求->请求钩子
+
+请求->请求钩子（尝试判断用户的身份 对于未登录用户不做处理  放行)   用g对象保存用户身份信息
+g.user_id = 1232   g.user_id =None
+->普通视图处理g.user_id i
+->强制登录视图->装饰器
+
+示例代码
+
+```python
+from flask import Flask,reauest,abort,current_app,g
+
+
+app = Flask(__name__)
+#请求钩子（尝试判断用户的身份对于未登录用户不做处理放行)用g对象保存用户身份信息
+@app.before_request
+def authentication():
+    """
+    利用before_request请求钩子，在进入所有视图前先尝试判断用户身份
+    :return: 
+    """
+    #TOD0此处利用鉴权机制（如cookie、session、jwt等）鉴别用户身份信息#if已登录用户，用户有身份信息
+    g.user_id = 123
+    # else未登录用户，用户无身份信息
+    # g.user_id =None
+    
+    
+#强制登录装饰器
+def login_required (func):
+    def wrapper(*arg,**kwargs):
+        #判断用户是否登录
+        if g.user_id is None:abort(401)
+        else:
+        # 已登录
+        return func( *args,**kwargs)
+    return wrapper
+
+
+@app.route( '/profile')
+@login_required
+def get_user_profile():
+    return 'user profile page user_id={} '.format(g.user_id)
+```
+
+
+
+## 3 app_context request_context
+
+思考
+在Flask程序未运行的情况下，调试代码时需要使用current_app . g .request这些对象，会不会有问题﹖该如何使用?
+app_context t
+app_context为我们提供了应用上下文环境，允许我们在外部使用应用上下文current_app
+、g
+可以通过with语句进行使用>>>
+
+>>>from flask import Flask>>>app = Flask( ' ')
+
+.>>>app.redis_cli = 'redis client'
+
+.>>>from flask import current_app
+
+.>>>current_app.redis_cli  #错误，没有上下文环境
+
+报错
+
+.>>>Yith app.app_context():    #借助with语句使用app_context创建应用上下文
+.>>>print(current_app.redis_cli)
+redis client
+
+### request_context
+
+request_context为我们提供了请求上下文环境，允许我们在外部使用请求上下文 request , session
+可以通过with语句进行使用
