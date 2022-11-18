@@ -1,5 +1,5 @@
 import json
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for
 from BP import user_bp
 
 
@@ -14,6 +14,11 @@ def deal_html():
     mstr = '!!!'
     mint = 10
     return render_template('index.html', my_str=mstr, my_int=mint)
+
+
+@app.route('/redirect')  # 重定向失败
+def redirect():
+    return redirect(url_for('http://www.itheima.com'))
 
 
 # 转换器测试
