@@ -369,8 +369,7 @@ class Mobileconverter(BaseConverter):
 
 2.将自定义的转换器告知Flask应用
 app = Flask(__name__)
-#将自定义转换器添加到转换器字典中，并指定转换器使用时名字为:
- mobileapp.url_map.converters [ ' mobile ' ] = Mobileconverter
+#将自定义转换器添加到转换器字典中，并指定转换器使用时名字为:mobile app.url_map.converters [ ' mobile ' ] = Mobileconverter
 
 3.在使用转换器的地方定义使用
 
@@ -379,8 +378,8 @@ def send_sms_code( mob_num ) :
 	return 'send sms code to {i} '.format(mob_num)
 
 2.其他参数
-如果想要获取其他地方传递的参数，可以通过Flask提供的request对象
-不同位置的参数都存放在request的不同属性中
+如果想要获取其他地方传递的参数，可以通过Flask提供的request对象。
+不同位置的参数都存放在request的不同属性中。
 属性		说明
 data		记录请求的数据，并转换为字符串
 form		记录请求中的表单数据
@@ -401,6 +400,7 @@ files	记录请求上传的文件
 
 使用render_template方法渲染模板并返回
 例如，新建一个模板index.html
+**模板文件需要放在templates模板文件目录里才能读取到**
 
 <!DOCTYPE html>
 <html lang="en">
@@ -414,7 +414,6 @@ files	记录请求上传的文件
 <br/>{{my_int}}
 </body>
 </html>
-
 from flask import render_template
 @app.route('/')
 def index():
