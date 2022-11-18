@@ -241,7 +241,7 @@ def route_ _map() :
 主视图，返回所有视图网址
 """
 rules_ iterator = app.url_ _map. iter_ rules()
-return json. dumps({rule. endpoint: rule.rule for rule in rules_ _iterator})
+return json. dumps({rule. endpoint: rule.rule for rule in rules _iterator})
 
 ### 请求方式
 
@@ -254,10 +254,12 @@ HEAD(自带)  简化版的GET请求
 只返回GET请求处理时的响应头，不返回响应体
 
 利用**methods参数**可以自己指定一个接口的请求方式
-@app.route(" / itcast1", methods=["POST"])def view_func_1():
-return "hello world 1"
-@app.route(" /itcast2", methods= ["GET","POST"])def view_func_2( ):
-return "hello world 2"
+@app.route(" / itcast1", methods=["POST"])
+def view_func_1():
+	return "hello world 1"
+@app.route(" /itcast2", methods= ["GET","POST"])
+def view_func_2( ):
+	return "hello world 2"
 
 
 
@@ -283,10 +285,13 @@ def user_profile( ):
 3.在应用对象上注册这个蓝图对象
 app.register_blueprint(user_bp)
 同级文件可以直接注册，在目录中的话需要先导入再注册
+4.添加蓝图访问前缀
+user_bp=Blueprin('user', __name__, url_prefix='user')
 
 ### 蓝图内部静态文件
 
-和应用对象不同，蓝图对象创建时不会默认注册静态目录的路由。需要我们在创建时指定 static_folder参数。
+和应用对象不同，蓝图对象创建时不会默认注册静态目录的路由。
+需要我们在创建时指定 static_folder参数。
 
 下面的示例将蓝图所在目录下的static_admin目录设置为静态目录
 admin=Blueprint("admin",__name__,static_folder='static_admin')
@@ -317,7 +322,7 @@ admin = Blueprint( ' admin ' ,__name__,template_folder='my_templates ')
 例如，有一个请求访问的接口地址为/users/123，其中123实际上为具体的请求参数，表明请求123号用户的信息。此时如何从url中提取出123的数据?
 Flask不同于Django直接在定义路由时编写正则表达式的方式，而是采用转换器语法:
 
-@app.route( '/users/Juser_id>')
+@app.route( '/users/<user_id>')
 def user_info(user_id ):
 	print(type(user_id))
 	return 'hello user {}'.format(user_id)
