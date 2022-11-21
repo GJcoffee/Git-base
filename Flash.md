@@ -44,7 +44,7 @@ app.run()
 
 ####  import_name:
 
-。Flask程序所在的包(模块)，传_name__就可以
+。Flask程序所在的包(模块)，传__name__就可以
 
 。其可以决定Flask 在访问静态文件时查找的路径
 
@@ -207,7 +207,8 @@ $ flask run
 
   . flask run --help获取帮助
   ·生产模式与开发模式的控制通过FLASK_ENV环境变量指明
-  oexport FLASK_ENV=production运行在生产模式，未指明则默认为此方式oexport FLASK_ENV=development运行在开发模式
+  export FLASK_ENV=production运行在生产模式，未指明则默认为此方式
+  export FLASK_ENV=development运行在开发模式
 
 
 
@@ -435,7 +436,7 @@ def demo2( ) :
 
 ### 3 返回JSON
 
-from flask importxjsonify
+from flask import jsonify
 
 @app.route( ' /demo3 ')
 def demo3():
@@ -470,22 +471,27 @@ def demo4( ):
 def demo5( ):
 	resp = make_response( 'make response测试')
 	resp.headers ["Itcast"] =“Python"
-	resp.statusI“404 not found"
+	resp.statusI=“404 not found"
 	return resp
 
 ## Cookie
 
 设置
 from flask import Flask, make_response
+
 app = Flask( __name___)
-@app.route( '/cookie ')def set_cookie( ) :
-resp = make_response( 'set cookie ok ')resp.set_cookie( 'username ' , 'itcast ')return resp
+
+@app.route( '/cookie ')
+def set_cookie( ) :
+	resp = make_response( 'set cookie ok ')
+	resp.set_cookie( 'username ' , 'itcast ')
+	return resp
 
 设置有效期
 @app.route( ' /cookie ')
 def set_cookie( ) :
 	response = make_response( ' hello world ')
-	response.set_cookie('username','itheima',Imax_age=3600)
+	response.set_cookie('username','itheima',max_age=3600)
 	return response
 
 读取
@@ -507,7 +513,7 @@ def delete_cookie( ) :
 
 ## Session
 
-保存会话数据
+通过秘钥加密保存会话数据，并将会话数据保存到cookie中
 
 session的使用需要先设置SECRET_KEY
 class DefaultConfig(object):
@@ -633,8 +639,8 @@ def teardown_request(response):
 
 思考︰在视图函数中，如何取到当前请求的相关数据?比如︰请求地址，请求方式，cookie等等在flask中，可以直接在视图函数中使用request 这个对象进行获取相关数据，而request就是请的对象，保存了当前本次请求的相关数据，请求上下文对象有:request、session
 request
-	封装了HTTP请求的内容，针对的是http请求。举例: user = request.args.get(user')，获 
-请求的参数。
+	封装了HTTP请求的内容，针对的是http请求。
+	举例: user = request.args.get('user')，获取请求的参数。
 session
 	用来记录请求会话中的信息，针对的是用户信息。举例: session['name'] = user.id，可以信息。还可以通过session.get('name')获取用户信息。
 
