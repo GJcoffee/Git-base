@@ -770,3 +770,32 @@ redis client
 
 request_context为我们提供了请求上下文环境，允许我们在外部使用请求上下文 request , session
 可以通过with语句进行使用
+
+
+
+# ORM数据库操作
+
+## Flask连接MySQL数据库
+
+```python
+# MySQL所在的主机名
+HOSTNAME = "127.0.0.1"
+# NySQL监听的端口号，默认3306PORT = 3306
+# 连接MySQL的用户名，读者用自己设置的USERNAME = "root"
+# 连接MySQL的密码，读者用自己的PASSWORD = "root"
+# MySQL上创建的数据库名称
+DATABASE = "database_learn"l
+app.config[ 'SQLALCHENY_DATABASE_URI' ] = f"mysql+pymysql://{USERNANE}:{PASSWORD}Q{HOSTNANE}:{PORT}/{DATABASE} ?charset=utf8"
+# 在app.config中设置好连接数据库的信息，#然后使用SQLAlchemy ( app)创建一个db对象
+# SQLAlchemy会自动读取app.config中连接数据库的信息
+db = SQLAlchemy(app)
+```
+
+测试数据库连接
+
+```python
+with app.app_context():
+    with db.engine.connect() as conn:
+        rs = conn.execute("select 1")
+        print(rs.fetchone()) # (1,)
+```
