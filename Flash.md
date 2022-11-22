@@ -612,19 +612,23 @@ teardown_request:
 		接受一个参数:错误信息，如果有相关错误抛出
 
 ```python
-#在第一次请求之前调用，可以在此方法内部做一些初始化操作@app.before_first_request
+#在第一次请求之前调用，可以在此方法内部做一些初始化操作
+@app.before_first_request
 def before_first_request():
     print ( "before_first_request")
 #在每一次请求之前调用，这时候已经有请求了，可能在这个方法里面做请求的校验
-#如果请求的校验不成功，可以直接在此方法中进行响应，直接return之后那么就不会执行视图函数@app.before_request
+#如果请求的校验不成功，可以直接在此方法中进行响应，直接return之后那么就不会执行视图函数
+@app.before_request
 def before_request():
-    print( "before_request")#if请求不符合条件:
+    print( "before_request")
+#if请求不符合条件:
 #return "la9wang"
 #在执行完视图函数之后会调用，并且会把视图函数所生成的响应传入,可以在此方法中对响应做最后一步统一的处理
 @app.after_request
 def after_request(response):
     print( "after_request")
-response.headers ["Content-Type"] = "application/json"return response
+    response.headers ["Content-Type"] = "application/json"
+    return response
 #请每一次请求之后都会调用，会接受一个参数，参数是服务器出现的错误信息@app.teardown_request
 def teardown_request(response):
     print( "teardown_request")
@@ -707,7 +711,7 @@ g.user_id = 1232   g.user_id =None
 示例代码
 
 ```python
-from flask import Flask,reauest,abort,current_app,g
+from flask import Flask,request,abort,current_app,g
 
 
 app = Flask(__name__)
@@ -728,14 +732,15 @@ def authentication():
 def login_required (func):
     def wrapper(*arg,**kwargs):
         #判断用户是否登录
-        if g.user_id is None:abort(401)
+        if g.user_id is None:
+            abort(401)
         else:
         # 已登录
-        return func( *args,**kwargs)
+        	return func( *args,**kwargs)
     return wrapper
 
 
-@app.route( '/profile')
+@app.route('/profile')
 @login_required
 def get_user_profile():
     return 'user profile page user_id={} '.format(g.user_id)

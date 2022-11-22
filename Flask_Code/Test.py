@@ -1,5 +1,8 @@
 import json
+
 from flask import Flask, render_template, redirect, url_for, jsonify, make_response, request, session, abort
+from flask import current_app, g
+
 from BP import user_bp
 
 app = Flask(__name__)
@@ -120,4 +123,3 @@ def internal_server_error(e):
     return '请稍后再访问!'
 
 
-# 请求钩子
