@@ -30,7 +30,9 @@ from flask import Flask
 #Flask类接收一个参数
 
 app = Flask(__name__)
-#装饰器的作用是将路由映射到视图函数index@app.route( ' / ')
+#装饰器的作用是将路由映射到视图函数index
+
+@app.route( ' / ')
 def index( ):
 return 'Hello world'
 
