@@ -6,7 +6,6 @@ from blueprints.qa import bp as qa_bp
 from blueprints.auth import bp as auth_bp
 from flask_migrate import Migrate
 
-
 app = Flask(__name__)
 # 绑定配置文件
 app.config.from_object(config)
@@ -18,6 +17,7 @@ migrate = Migrate(app, db)
 
 app.register_blueprint(qa_bp)
 app.register_blueprint(auth_bp)
+
 
 # blueprint：用来做模块化的
 # 电影、读书、音乐、xxx
@@ -41,8 +41,6 @@ def my_before_request():
 @app.context_processor
 def my_context_processor():
     return {"user": g.user}
-
-
 
 
 if __name__ == '__main__':

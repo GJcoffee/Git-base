@@ -1,11 +1,19 @@
 from exts import db
+
 from datetime import datetime
 
 
 class UserModel(db.Model):
-    __tablename__ = "user"
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # ID 作为主键 自动增长
-    username = db.Column(db.String(100), nullable=False)  # 用户名，不能为空
-    password = db.Column(db.String(100), nullable=False)  # 密码
-    email = db.column(db.String(100), nullable=False, unique=True)  # 邮箱不能为空 且唯一
-    join_time = db.column(db.DateTime, default=datetime.now)  # 加入时间
+    __tablename__ = "USERS"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    username = db.Column(db.String(100), nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+    email = db.Column(db.String(100), nullable=False, unique=True)
+    join_time = db.Column(db.DateTime, default=datetime.now)
+
+
+class EmailCaptchaModel(db.Model):
+    __tablename__ = "email_captcha"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    email = db.Column(db.String(100), nullable=False)
+    captcha = db.Column(db.String(100), nullable=False)
