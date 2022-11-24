@@ -17,3 +17,4 @@ class EmailCaptchaModel(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     email = db.Column(db.String(100), nullable=False)
     captcha = db.Column(db.String(100), nullable=False)
+    # used = db.Column(db.Boolean, default=False)

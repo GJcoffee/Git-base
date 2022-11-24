@@ -6,6 +6,8 @@ from flask_mail import Message
 import string
 from models import EmailCaptchaModel
 
+from .forms import RegisterForm
+
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
@@ -14,10 +16,19 @@ def login():
     pass
 
 
-# 渲染注册模板
-@auth_bp.route('/register')
+@auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
-    return render_template(register.html)
+    # 渲染注册模板
+    if request.method == 'GET':
+        return render_template('register.html')
+    else:
+        # 验证用户提交的邮箱和验证码是否对应且正确
+        form = RegisterForm(request.form)
+        if form.validate():  # 可自行调用相关验证器进行验证
+            return 'success'
+        else:
+            print(form.errors)
+            return 'fail'
 
 
 # 邮件发送验证码功能
