@@ -1,5 +1,4 @@
-from flask import Flask
-from flask import render_template
+from flask import Flask, g, session
 import config
 
 from exts import db, mail
@@ -30,9 +29,19 @@ flask db upgrate
 mail.init_app(app)
 
 
-@app.route('/')
-def index():
-    return render_template('register.html')
+@app.before_request
+def my_before_request():
+    user_id = session.get('user_id')
+    if user_id:
+        user = UserModel.query.get(user_id)
+        g.user = user
+    else:
+        g.user = None
+
+
+@app.context_processor
+def my_context_processor():
+    return {"user": g.user}
 
 
 if __name__ == '__main__':
