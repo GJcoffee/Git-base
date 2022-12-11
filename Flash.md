@@ -233,7 +233,7 @@ print(app.url_map)
 
 如果想在程序中遍历路由信息，可以采用如下方式
 for rule in app.url_map.iter_rules ( ):
-print( 'name=f} path={} '.format(rule.endpoint,rule.rule))
+	print( 'name=f} path={} '.format(rule.endpoint,rule.rule))
 
 需求:
 通过访问/地址，以json的方 式返回应用内的所有路由信息
