@@ -849,7 +849,8 @@ def query_user():
     # Query:类数组
     users = User.query.filter_by(username="法外狂徒张三")
     for user in users:
-        print(user.username)]return“数据查找成功!"
+        print(user.username)]
+        return“数据查找成功!"
 ```
 
 数据修改
